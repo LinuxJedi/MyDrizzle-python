@@ -1,3 +1,5 @@
 _drizzle.c~
 build/
+.tox/
+MyDrizzle.egg-info/
 

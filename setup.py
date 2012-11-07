@@ -14,7 +14,22 @@
 
 import sys
 import setuptools
+from setuptools.command.test import test as TestCommand
 
+ci_cmdclass = {}
+
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        #import here, cause outside the eggs aren't loaded
+        import pytest
+        pytest.main(self.test_args)
+
+ci_cmdclass['test'] = PyTest
 
 setuptools.setup(
         name="MyDrizzle",
@@ -25,5 +40,7 @@ setuptools.setup(
             setuptools.Extension('_drizzle', ['_drizzle.c'],
                 libraries=['drizzle'], include_dirs=['/usr/local/include'],
                 library_dirs=['/usr/local/lib'])
-        ]
+        ],
+        py_modules = ['_drizzle_exceptions'],
+        cmdclass=ci_cmdclass
     )

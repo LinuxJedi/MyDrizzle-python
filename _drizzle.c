@@ -69,6 +69,40 @@ static int _drizzle_ConnectionObject_clear(
 
 extern PyTypeObject _drizzle_ConnectionObject_Type;
 
+static PyObject *_drizzle_NewException(
+        PyObject *dict,
+        PyObject *edict,
+        char *name)
+{
+    PyObject *e;
+
+    if (!(e = PyDict_GetItemString(edict, name)))
+    {
+        return NULL;
+    }
+    if (PyDict_SetItemString(dict, name, e))
+    {
+        return NULL;
+    }
+    Py_INCREF(e);
+    return e;
+}
+
+PyObject *_drizzle_Exception(_drizzle_ConnectionObject *d)
+{
+    PyObject *t, *e;
+    if (!(t = PyTuple_New(2)))
+    {
+        return NULL;
+    }
+    e = _drizzle_InternalError;
+    PyTuple_SET_ITEM(t, 0, PyInt_FromLong(-1L));
+    PyTuple_SET_ITEM(t, 1, PyString_FromString("generic error"));
+    PyErr_SetObject(e, t);
+    Py_DECREF(t);
+    return NULL;
+}
+
 static int _drizzle_ConnectionObject_Initialize(
         _drizzle_ConnectionObject *self,
         PyObject *args,
